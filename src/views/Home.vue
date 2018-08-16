@@ -1,20 +1,61 @@
 <template>
   <v-container fluid>
-    <v-slide-y-transition mode="out-in">
-      <v-layout column align-center>
-        <img src="@/assets/logo.png" alt="Vuetify.js" class="mb-5">
-        <blockquote>
-          &#8220;First, solve the problem. Then, write the code.&#8221;
+          <v-progress-circular
+            indeterminate
+            color="primary"
+            v-show="isLoading"
+          ></v-progress-circular>
+      <v-layout v-show="!isLoading" column align-center>
+        <v-list two-line>
+          <template v-for="team in teams">
+            <v-list-tile
+              :key="team.ratings"
+              avatar
+              @click="getTeam(team.team_id)"
+            >
+              <v-list-tile-avatar>
+                <v-icon v-html="'pages'"></v-icon>
+              </v-list-tile-avatar>
+
+              <v-list-tile-content>
+                <v-list-tile-title v-html="team.name"></v-list-tile-title>
+                <v-list-tile-sub-title >Wins: {{team.wins}}</v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </template>
+        </v-list>
           <footer>
             <small>
               <em>&mdash;John Johnson</em>
             </small>
           </footer>
-        </blockquote>
       </v-layout>
-    </v-slide-y-transition>
   </v-container>
 </template>
+<script>
+export default {
+  data () {
+    return {
+      teams: [],
+      isLoading: true
+    }
+  },
+  mounted () {
+    const api_url = 'https://api.opendota.com/api';
+    // get rankings from dota api
+    axios.get(`${api_url}/teams`).then(response => {
+      this.isLoading = false;
+      this.teams = response.data;
+      
+    })
+  },
+  methods: {
+    getTeam(team_id) {
+      this.$router.push({name: 'team', params: {id: team_id}});
+    }
+  }
+}
+</script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
